@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - include:
+      file: roles.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: users.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: cards.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: transfers.yaml
+      relativeToChangelogFile: true
+

@@ -1,0 +1,63 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-create-transfers
+      author: taskbank
+      changes:
+        - createTable:
+            tableName: card_transfers
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: from_card_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: to_card_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: amount
+                  type: numeric(19,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: card_transfers
+            baseColumnNames: from_card_id
+            constraintName: fk_transfers_from
+            referencedTableName: cards
+            referencedColumnNames: id
+
+        - addForeignKeyConstraint:
+            baseTableName: card_transfers
+            baseColumnNames: to_card_id
+            constraintName: fk_transfers_to
+            referencedTableName: cards
+            referencedColumnNames: id
+
+        - createIndex:
+            indexName: idx_transfers_from
+            tableName: card_transfers
+            columns:
+              - column:
+                  name: from_card_id
+
+        - createIndex:
+            indexName: idx_transfers_to
+            tableName: card_transfers
+            columns:
+              - column:
+                  name: to_card_id
+

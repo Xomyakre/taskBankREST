@@ -1,0 +1,66 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-create-cards
+      author: taskbank
+      changes:
+        - createTable:
+            tableName: cards
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: owner_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: encrypted_number
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last4
+                  type: varchar(4)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: expiry_date
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar(16)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: balance
+                  type: numeric(19,2)
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: cards
+            baseColumnNames: owner_id
+            constraintName: fk_cards_owner
+            referencedTableName: users
+            referencedColumnNames: id
+
+        - createIndex:
+            indexName: idx_cards_owner
+            tableName: cards
+            columns:
+              - column:
+                  name: owner_id
+
+        - createIndex:
+            indexName: idx_cards_last4
+            tableName: cards
+            columns:
+              - column:
+                  name: last4
+

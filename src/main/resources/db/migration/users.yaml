@@ -1,0 +1,106 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-create-users
+      author: taskbank
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: username
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: password_hash
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: user_roles
+            columns:
+              - column:
+                  name: user_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+
+        - addPrimaryKey:
+            tableName: user_roles
+            columnNames: user_id, role_id
+            constraintName: pk_user_roles
+
+        - addForeignKeyConstraint:
+            baseTableName: user_roles
+            baseColumnNames: user_id
+            constraintName: fk_user_roles_user
+            referencedTableName: users
+            referencedColumnNames: id
+
+        - addForeignKeyConstraint:
+            baseTableName: user_roles
+            baseColumnNames: role_id
+            constraintName: fk_user_roles_role
+            referencedTableName: roles
+            referencedColumnNames: id
+
+        # init-seed для dev: пароли вида "{noop}password"
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  value: "00000000-0000-0000-0000-000000000101"
+              - column:
+                  name: username
+                  value: "admin"
+              - column:
+                  name: password_hash
+                  value: "{noop}admin123"
+
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  value: "00000000-0000-0000-0000-000000000102"
+              - column:
+                  name: username
+                  value: "user"
+              - column:
+                  name: password_hash
+                  value: "{noop}user123"
+
+        - insert:
+            tableName: user_roles
+            columns:
+              - column:
+                  name: user_id
+                  value: "00000000-0000-0000-0000-000000000101"
+              - column:
+                  name: role_id
+                  value: "00000000-0000-0000-0000-000000000001"
+
+        - insert:
+            tableName: user_roles
+            columns:
+              - column:
+                  name: user_id
+                  value: "00000000-0000-0000-0000-000000000102"
+              - column:
+                  name: role_id
+                  value: "00000000-0000-0000-0000-000000000002"
+

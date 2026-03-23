@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-roles
+      author: taskbank
+      changes:
+        - createTable:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(32)
+                  constraints:
+                    nullable: false
+                    unique: true
+
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  value: "00000000-0000-0000-0000-000000000001"
+              - column:
+                  name: name
+                  value: "ADMIN"
+
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  value: "00000000-0000-0000-0000-000000000002"
+              - column:
+                  name: name
+                  value: "USER"
+
