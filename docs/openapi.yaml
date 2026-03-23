@@ -1,0 +1,238 @@
+openapi: 3.0.3
+info:
+  title: taskBankREST API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+security:
+  - bearerAuth: []
+tags:
+  - name: Auth
+  - name: Admin Cards
+  - name: Cards
+
+paths:
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        "200":
+          description: Token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+
+  /api/admin/cards:
+    get:
+      tags: [Admin Cards]
+      parameters:
+        - in: query
+          name: ownerId
+          schema: { type: string, format: uuid }
+        - in: query
+          name: status
+          schema: { type: string }
+        - in: query
+          name: last4
+          schema: { type: string, maxLength: 4 }
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 0 }
+        - in: query
+          name: size
+          schema: { type: integer, minimum: 1 }
+      responses:
+        "200":
+          description: Paged cards
+    post:
+      tags: [Admin Cards]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCardRequest'
+      responses:
+        "200":
+          description: Created card
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardResponse'
+
+  /api/admin/cards/{cardId}/block:
+    patch:
+      tags: [Admin Cards]
+      parameters:
+        - in: path
+          name: cardId
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Updated card
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardResponse'
+
+  /api/admin/cards/{cardId}/activate:
+    patch:
+      tags: [Admin Cards]
+      parameters:
+        - in: path
+          name: cardId
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Updated card
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardResponse'
+
+  /api/cards:
+    get:
+      tags: [Cards]
+      parameters:
+        - in: query
+          name: status
+          schema: { type: string }
+        - in: query
+          name: last4
+          schema: { type: string, maxLength: 4 }
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 0 }
+        - in: query
+          name: size
+          schema: { type: integer, minimum: 1 }
+      responses:
+        "200":
+          description: Paged cards
+
+  /api/cards/{cardId}/balance:
+    get:
+      tags: [Cards]
+      parameters:
+        - in: path
+          name: cardId
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Balance
+
+  /api/cards/{cardId}/block:
+    post:
+      tags: [Cards]
+      parameters:
+        - in: path
+          name: cardId
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Updated card
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardResponse'
+
+  /api/cards/{fromCardId}/transfers:
+    post:
+      tags: [Cards]
+      parameters:
+        - in: path
+          name: fromCardId
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRequest'
+      responses:
+        "200":
+          description: Transfer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username: { type: string }
+        password: { type: string }
+
+    LoginResponse:
+      type: object
+      properties:
+        token: { type: string }
+        tokenType: { type: string }
+
+    CreateCardRequest:
+      type: object
+      required: [ownerId, cardNumber, expiryMonth, initialBalance, initialStatus]
+      properties:
+        ownerId: { type: string, format: uuid }
+        cardNumber: { type: string }
+        expiryMonth: { type: string, example: "2026-12" }
+        initialBalance: { type: number, format: double }
+        initialStatus: { type: string }
+
+    UpdateCardRequest:
+      type: object
+      required: [expiryMonth, balance, status]
+      properties:
+        expiryMonth: { type: string }
+        balance: { type: number, format: double }
+        status: { type: string }
+
+    CardResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        cardNumberMasked: { type: string }
+        ownerId: { type: string, format: uuid }
+        ownerUsername: { type: string }
+        expiryDate: { type: string, format: date }
+        status: { type: string }
+        balance: { type: number, format: double }
+
+    TransferRequest:
+      type: object
+      required: [toCardId, amount]
+      properties:
+        toCardId: { type: string, format: uuid }
+        amount: { type: number, format: double }
+
+    TransferResponse:
+      type: object
+      properties:
+        transferId: { type: string, format: uuid }
+        fromCardId: { type: string, format: uuid }
+        toCardId: { type: string, format: uuid }
+        amount: { type: number, format: double }
+        createdAt: { type: string }
+
